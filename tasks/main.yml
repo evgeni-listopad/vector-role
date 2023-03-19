@@ -6,13 +6,15 @@
   - name: Get RPM packages
     ansible.builtin.get_url:
       url: "https://packages.timber.io/vector/{{ vector_version }}/{{ item }}-{{ vector_version }}-1.x86_64.rpm"
-      dest: "./{{ item }}.rpm"
+      dest: "/opt/{{ item }}.rpm"
     with_items: "{{ vector_packages }}"
   - name: Install RPM packages
     become: true
     ansible.builtin.yum:
-      name: "{{ item }}.rpm"
+      name: "/opt/{{ item }}.rpm"
+      state: present
       disable_gpg_check: true
+      disablerepo: "appstream,baseos"
     with_items: "{{ vector_packages }}"
   - name: Copy server configuration file
     become: true
@@ -22,4 +24,3 @@
       owner: "0"
       group: "0"
       mode: "0664"
-    notify: Start vector service
